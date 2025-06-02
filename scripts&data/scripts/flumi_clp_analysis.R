@@ -71,7 +71,10 @@ allobs <- clean_names(allobs)
 
 #date formats
 allobs[ , .N ,  survey_date]
+allobs[ , .N , treatment_date]
 
+allobs[ , survey_date := as.IDate(survey_date, format = "%m/%d/%Y") ,  ]
+allobs[ , treatment_date := as.IDate(treatment_date, format = "%m/%d/%Y") ,  ]
 
 #explore
 
@@ -81,21 +84,30 @@ allobs[ , .N , lake_name]
 
 allobs[ , .N , .(site, survey_purpose)][order(survey_purpose, site)]
 
-allobs[ , .N , .(site, lake_name, survey_date)][order(lake_name, survey_date)]
+allobs[ , .N , .(site,survey_purpose, lake_name, survey_date, k_survey_id)][order(lake_name, survey_date)]
 
+allobs[ , .N, sample_type_descr]
 
-
-
-
-
+allobs[ , .N , .(species_code, genus, species, lower_level_tax) ]
 
 
 
 # clp response ------------------------------------------------------------
 
+# compile 2 metrics for clp in ech of these surveys: rake abund where present AND foc in plot
 
+# do for each survey
+#survey table
+surveydat <- allobs[ sample_type_descr == "sampled" , .("n_samp" = length(unique(sta_nbr))) , .(site,survey_purpose, lake_name, survey_date, k_survey_id) ]
+# curlyleaf metrics
+allobs[ sample_type_descr == "sampled" & species_code == "PC", .N , abundance ]
 
-
+# foc
+clp_stats <- 
+allobs[sample_type_descr == "sampled" & species_code == "PC" & abundance > 0,
+       .("n_clp" = length(unique(sta_nbr)),
+         "mean_ra_clp" = mean(abundance)) ,
+       .(site,survey_purpose, lake_name, survey_date, k_survey_id) ]
 
 
 
