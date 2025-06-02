@@ -141,6 +141,7 @@ ggplot(surveydat, aes(survey_purpose, freq))+
 
 
 
+
 ggplot(surveydat, aes(site, mean_ra_clp))+
   geom_violin()+
   geom_boxplot()+
